@@ -9,14 +9,11 @@ int history(char *hist[], int current)
 {
    //Dung bien check de kiem tra lich su co trong khong
    int check = 0;
-   for (int i = 0; i < HISTORY_BUFFER; i++) {
+   for (int i = 0; i < HISTORY_BUFFER; i++)
       if (hist[i] == NULL)
          check++;
-      else
-         break;
-   }
 
-   if (check == HISTORY_BUFFER)
+   if (check == HISTORY_BUFFER - 1)
       printf("No commands in history!\n");
    else {
       int i = current;
@@ -39,7 +36,6 @@ int clear_history(char *hist[])
       free(hist[i]);
       hist[i] = NULL;
    }
-   printf("Removed history completed!\n");
    return 0;
 }
 
@@ -50,7 +46,7 @@ int main()
    int current = 0;
    //Khoi tao command trong lich su toan rong
    for (int i = 0; i < HISTORY_BUFFER; i++)
-      hist[i] = NULL;
+   hist[i] = NULL;
 
    while (1) {
       printf("osh>");
@@ -60,7 +56,7 @@ int main()
       if (strlen(command) == 1 && command[0] == '\n') {
          //Neu la command dau tien thi bat buoc phai nhap
          if (current == 0 && hist[HISTORY_BUFFER - 1] == NULL)
-            printf("Error! Please enter first command!\n");
+         printf("Error! Please enter first command!\n");
          else {
             free(hist[current]);
             if (current == 0) {
@@ -79,19 +75,23 @@ int main()
          free(hist[current]);
          hist[current] = strdup(command);
       }
+
       strcpy(command, hist[current]);
       //Kiem tra lich su
       if (strcmp(command, "history") == 0)
          history(hist, current);
       //Xoa buffer
-      else if (strcmp(command, "clear") == 0)
+      else if (strcmp(command, "clear") == 0) {
          clear_history(hist);
+         printf("Removed history completed!\n");
+      }
       //Thoat chuong trinh
       else if (strcmp(command, "exit") == 0)
-         break;
+      break;
 
       //Tang current sau moi lan chay
       current = (current + 1) % HISTORY_BUFFER;
+
    }
    //tra lai vung nho khi ket thuc chuong trinh
    clear_history(hist);
