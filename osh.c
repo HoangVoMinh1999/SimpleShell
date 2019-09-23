@@ -79,15 +79,15 @@ int main()
          free(hist[current]);
          hist[current] = strdup(command);
       }
-
+      strcpy(command, hist[current]);
       //Kiem tra lich su
-      if (strcmp(hist[current], "history") == 0)
+      if (strcmp(command, "history") == 0)
          history(hist, current);
       //Xoa buffer
-      else if (strcmp(hist[current], "clear") == 0)
+      else if (strcmp(command, "clear") == 0)
          clear_history(hist);
       //Thoat chuong trinh
-      else if (strcmp(hist[current], "exit") == 0)
+      else if (strcmp(command, "exit") == 0)
          break;
 
       //Tang current sau moi lan chay
