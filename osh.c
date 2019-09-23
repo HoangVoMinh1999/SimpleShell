@@ -55,8 +55,10 @@ int main()
       //Truong hop 1: command trong (chi enter)
       if (strlen(command) == 1 && command[0] == '\n') {
          //Neu la command dau tien thi bat buoc phai nhap
-         if (current == 0 && hist[HISTORY_BUFFER - 1] == NULL)
-         printf("Error! Please enter first command!\n");
+         if (current == 0 && hist[HISTORY_BUFFER - 1] == NULL) {
+            printf("Error! Please enter first command!\n");
+            continue;
+         }
          else {
             free(hist[current]);
             if (current == 0) {
