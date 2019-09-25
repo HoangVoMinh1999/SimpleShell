@@ -31,8 +31,7 @@ int history(char hist[HISTORY_BUFFER][MAX_CMD_LEN], int current)
 
 int clear_history(char hist[HISTORY_BUFFER][MAX_CMD_LEN])
 {
-   int i;
-   for (i = 0; i < HISTORY_BUFFER; i++) {
+   for (int i = 0; i < HISTORY_BUFFER; i++) {
       hist[i][0] = '\0';
    }
    return 0;
@@ -46,36 +45,33 @@ int main()
 
    while (1) {
       printf("osh>");
-     
       fgets(command, MAX_CMD_LEN, stdin);
 
       //Truong hop 1: command trong (chi enter)
-     
       if (strlen(command) == 1 && command[0] == '\n') {
-         
-         //Neu la command dau tien thi bat buoc phai nhap
-         if (current == 0 && hist[HISTORY_BUFFER - 1] == NULL) {
-            printf("Error! Please enter first command!\n");
-            continue;
-         }
-         else {
-            //free(hist[current]);
-            if (current == 0) {
-               strcpy(hist[current], hist[HISTORY_BUFFER - 1]);
-               printf("%s\n", hist[current]);
-            }
+         //Truong hop la vi tri dau tien
+         if (current == 0){
+            //Mang chua lap day HISTORY_BUFFER
+            if (hist[HISTORY_BUFFER - 1][0] == '\0')
+               printf("Error! Please enter first command!\n");
+            //Truong hop buffer da day va quay lai vi tri dau tien
             else {
                strcpy(hist[current], hist[HISTORY_BUFFER - 1]);
                printf("%s\n", hist[current]);
             }
          }
+         //Truong hop khong phai la vi tri dau tien
+         else {
+            strcpy(hist[current], hist[current - 1]);
+            printf("%s\n", hist[current]);
+         }
       }
-      
+
       //Truong hop 2: command binh thuong thi loai ki tu '\n' cuoi
       else {
          command[strlen(command) - 1] = '\0';
          //free(hist[current]);
-         strcpy(hist[current], strdup(command));
+         strcpy(hist[current], command);
       }
 
       strcpy(command, hist[current]);
@@ -84,17 +80,20 @@ int main()
          history(hist, current + 1);
       //Xoa buffer
       else if (strcmp(command, "clear") == 0) {
+         char command_temp[MAX_CMD_LEN];
+         strcpy(command_temp, hist[current]);
          clear_history(hist);
+         strcpy(hist[current], command_temp);
          printf("Removed history completed!\n");
       }
       //Thoat chuong trinh
       else if (strcmp(command, "exit") == 0)
-      break;
+         break;
 
       //Tang current sau moi lan chay
       current = (current + 1) % HISTORY_BUFFER;
    }
-   
+
    //tra lai vung nho khi ket thuc chuong trinh
    clear_history(hist);
 
