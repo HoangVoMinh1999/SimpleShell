@@ -46,15 +46,13 @@ int main()
 			char *token=strtok(command," "); 
 			char *Redirect_File[3];
 			Redirect_File[0]=token; // Redirect_File[0]=function
-			 Redirect_File[0][strlen(Redirect_File[0])]='\0';
-			printf("%s",Redirect_File[0]);
+			printf("%s\n",Redirect_File[0]);
 			/* ---get sign and file name--- */
 			int i=1;
-			while (token != NULL)
+			while (token != NULL && i!=4)
 			{
 				token=strtok(NULL, " ");
-				strcpy(Redirect_File[i],token); // Redirect_File[1]=sign,Redirect_File[2]=file_name
-				// Redirect_File[i][strlen(Redirect_File[i])]='\0';
+				Redirect_File[i]=token; // Redirect_File[1]=sign,Redirect_File[2]=file_name
 				printf("%s\n",Redirect_File[i]);
 				i++;
 			}
