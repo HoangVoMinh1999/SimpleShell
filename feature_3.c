@@ -31,39 +31,42 @@ int Check_Sign(char str[])
 	}
 	return 1;
 }
-void Getter_Data_From_File(char *sign,char *file_name,int len_of_data,int data[])
+void Getter_Data_From_File(char *sign,char *file_name,int data[])
 {
 	if (sign[0]==60) // dấu hiệu input
 	{
-		printf("Da chay ham nay\n");
 		FILE *f=fopen(file_name,"r");
 		if (f==NULL)
 		{
-			printf("FILE NOT EXIST");
+			printf("FILE NOT EXIST\n");
 			return NULL;
 		}
-		int i=0;
-		fscanf(f,"%d",len_of_data);
-		printf("%d\n",len_of_data);
+		fscanf(f,"%d ",&len_of_data);
 		for (int i=0;i<len_of_data;i++)
 		{
-			fscanf(f,"%d",data[i]);
-			printf("%d",data[i]);
+			int temp;
+			fscanf(f,"%d",&temp);
+			data[i]=temp;
 		}
 		fclose(f);
+		for (int i=0;i<len_of_data;i++)
+		{
+			printf("%d ",data[i]);
+		}
+		printf("\n");
 	}
 	else if (sign[0]==62)
 	{
-		FILE *f=fopen(file_name,"w");
+		FILE *f=fopen(file_name,"wt");
 		if (f==NULL)
 		{
 			printf("No file output !!!");
 			return NULL;
 		}
-		fprintf(f,"%d",len_of_data);
+		fprintf(f,"%d ",len_of_data);
 		for (int i=0;i<len_of_data;i++)
 		{
-			fprintf(f,"%s",data[i]);
+			fprintf(f,"%d ",data[i]);
 		}
 		fclose(f);
 	}
@@ -78,7 +81,6 @@ int main()
 		fgets(command,MAX_CMD_LEN, stdin);
 		command[strlen(command)-1]=' ';
 		command[strlen(command)]='\0';
-		printf("%saa\n",command);
 		if (Check_Command(command)==1) // Kiểm tra dòng code hợp lệ vs file
 		{
 			/* ---get function--- */
@@ -93,10 +95,6 @@ int main()
 				Redirect_File[i]=token; // Redirect_File[1]=sign,Redirect_File[2]=file_name
 				i++;
 			}
-			for (int i=0;i<4;i++)
-			{
-				printf("vi tri thu [%d]=%saa\n",i,Redirect_File[i]);
-			}
 			if(Check_Sign(Redirect_File[1])==0)// nhập sai kí tự , khác < >
 			{
 				printf("Wrong command\n");
@@ -104,11 +102,7 @@ int main()
 			}
 			else
 			{
-				Getter_Data_From_File(Redirect_File[1],Redirect_File[2],len_of_data,data);
-				for (int i=0;i<10;i++)
-				{
-					printf("%d ",data[i]);
-				}
+				Getter_Data_From_File(Redirect_File[1],Redirect_File[2],data);
 			}
 			
 		}
