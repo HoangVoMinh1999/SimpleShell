@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 #include <string.h>
 
 #define MAX_CMD_LEN  128
@@ -42,6 +45,11 @@ int main()
    char command[MAX_CMD_LEN];
    char hist[HISTORY_BUFFER][MAX_CMD_LEN] = {"\0"};
    int current = 0;
+   char* args[5];
+   char* rest = command;
+   int i = 0;
+   int copy_desc;
+   int check;
 
    while (1) {
       printf("osh>");
@@ -74,18 +82,59 @@ int main()
          strcpy(hist[current], command);
       }
 
+      //Goi fork() de chia tien trinh
+      pid_t pid;
+      pid = fork();
+
+      //Kiem tra tien trinh
+         //Tien trinh con
+      if (pid == 0) {
+            //Tach command thanh tung chuoi vao args
+            while(args[i] = strtok_r(rest, " ", &rest)){
+               i++;
+            }
+            args[i] = NULL;
+
+            if (args[i-2][0] == '>') {
+               int fd = open(args[i-1], O_WRONLY | O_APPEND | O_CREAT);
+
+               if (fd < 0)
+                  printf("Error opening the file!\n");
+
+               copy_desc = dup(1);
+               dup2(fd, 1);
+               args[i-2] = NULL;
+               check = 1;
+            }
+            if (args[i-2][0] == '<') {
+               int fd = open(args[i-1], O_RDONLY);
+
+               if (fd < 0)
+                  printf("Error opening the file!\n");
+
+               copy_desc = dup(0);
+               dup2(fd, 0);
+               args[i-2] = NULL;
+               check = 0;
+            }
+            execvp(args[0], args);
+         }
+         //Tien trinh cha
+      else if (pid > 0) {
+         wait(0);
+         if (check == 1)
+            dup2(copy_desc, 1);
+         if (check == 0)
+            dup2(copy_desc, 0);
+      }
+      else {
+         printf("Failed to create new process!\n");
+      }
+
       strcpy(command, hist[current]);
       //Kiem tra lich su
       if (strcmp(command, "history") == 0)
          history(hist, current + 1);
-      //Xoa buffer
-      else if (strcmp(command, "clear") == 0) {
-         char command_temp[MAX_CMD_LEN];
-         strcpy(command_temp, hist[current]);
-         clear_history(hist);
-         strcpy(hist[current], command_temp);
-         printf("Removed history completed!\n");
-      }
       //Thoat chuong trinh
       else if (strcmp(command, "exit") == 0)
          break;
