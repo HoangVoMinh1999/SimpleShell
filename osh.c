@@ -45,7 +45,7 @@ int main()
    char command[MAX_CMD_LEN];
    char hist[HISTORY_BUFFER][MAX_CMD_LEN] = {"\0"};
    int current = 0;
-   char* args[5];
+   char* args[20];
    char* rest = command;
    int i = 0;
    int copy_desc;
@@ -53,6 +53,7 @@ int main()
 
    while (1) {
       printf("osh>");
+      fflush(stdout);
       fgets(command, MAX_CMD_LEN, stdin);
 
       //Truong hop 1: command trong (chi enter)
@@ -65,12 +66,14 @@ int main()
             //Truong hop buffer da day va quay lai vi tri dau tien
             else {
                strcpy(hist[current], hist[HISTORY_BUFFER - 1]);
+               strcpy(command, hist[HISTORY_BUFFER - 1]);
                printf("%s\n", hist[current]);
             }
          }
          //Truong hop khong phai la vi tri dau tien
          else {
             strcpy(hist[current], hist[current - 1]);
+            strcpy(command, hist[current - 1]);
             printf("%s\n", hist[current]);
          }
       }
@@ -78,13 +81,11 @@ int main()
       //Truong hop 2: command binh thuong thi loai ki tu '\n' cuoi
       else {
          command[strlen(command) - 1] = '\0';
-         //free(hist[current]);
          strcpy(hist[current], command);
       }
 
       //Goi fork() de chia tien trinh
-      pid_t pid;
-      pid = fork();
+      pid_t pid = fork();
 
       //Kiem tra tien trinh
          //Tien trinh con
@@ -95,6 +96,7 @@ int main()
             }
             args[i] = NULL;
 
+            //Command yeu cau ghi ra file
             if (args[i-2][0] == '>') {
                int fd = open(args[i-1], O_WRONLY | O_APPEND | O_CREAT);
 
@@ -106,6 +108,8 @@ int main()
                args[i-2] = NULL;
                check = 1;
             }
+
+            //Command yeu cau thuc thi lenh voi file input
             if (args[i-2][0] == '<') {
                int fd = open(args[i-1], O_RDONLY);
 
@@ -117,11 +121,19 @@ int main()
                args[i-2] = NULL;
                check = 0;
             }
+
+            //Xu li pipe()
+            if (args[i-2][0] == '|') {
+               pid_t pid_c;
+               pid_c = fork();
+            }
+
             execvp(args[0], args);
+            exit(1);
          }
          //Tien trinh cha
       else if (pid > 0) {
-         wait(0);
+         wait(NULL);
          if (check == 1)
             dup2(copy_desc, 1);
          if (check == 0)
