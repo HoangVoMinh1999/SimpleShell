@@ -220,9 +220,6 @@ int main() {
    char* args[MAX_ARGS_SIZE];
    int current = 0;
    int args_len = 0;
-   int i = 0;
-   int copy_desc;
-   int check;
    int running = 1;
    pid_t pid;
 
