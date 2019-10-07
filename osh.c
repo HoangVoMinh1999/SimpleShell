@@ -221,6 +221,7 @@ int main() {
    int current = 0;
    int args_len = 0;
    int running = 1;
+   int check = 0;
    pid_t pid;
 
    while (running) {
@@ -269,6 +270,12 @@ int main() {
          //Parsing command to args array
          parsing(command, args, &args_len);
 
+         //Check the last member in args is '&'
+         if (strcmp(args[args_len - 1], NO_WAIT_KEY) == 0){
+            args[args_len - 1] = END_STR;
+            check = 1;
+         }
+
          //Duplicate process
          pid = fork();
 
@@ -278,7 +285,8 @@ int main() {
          }
          else if (IS_IN_PARENT(pid)) {
             //Wait child process to be terminated
-            wait(NULL);
+            if (check == 0)
+               wait(NULL);
          }
          else {
             puts(msg[PS_NO_CREATE]);
